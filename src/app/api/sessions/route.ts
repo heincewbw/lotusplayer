@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     data: {
       date: new Date(date),
       notes: notes ?? null,
-      createdBy: session.user.id!,
+      createdBy: session.user!.id!,
       entries: {
         create: entries.map((e: { playerId: number; rowNumber: number; ambil: number; sisa: number }) => ({
           playerId: e.playerId,
