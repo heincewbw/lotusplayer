@@ -107,8 +107,10 @@ export default function StatsPage() {
             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip
-              formatter={(value: number) =>
-                value > 0 ? `+${value.toLocaleString()}` : value.toLocaleString()
+              formatter={(value) =>
+                typeof value === "number"
+                  ? value > 0 ? `+${value.toLocaleString()}` : value.toLocaleString()
+                  : value
               }
             />
             <Bar
