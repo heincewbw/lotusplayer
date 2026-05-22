@@ -26,15 +26,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         )
         if (!valid) return null
 
-        return { id: user.id, email: user.email }
+        return { id: user.id, email: user.email, role: user.role }
       },
     }),
   ],
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token.id = user.id
+        token.id = user.id as string
         token.email = user.email
+        token.role = user.role
       }
       return token
     },
@@ -42,6 +43,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token) {
         session.user.id = token.id as string
         session.user.email = token.email as string
+        session.user.role = (token.role as string) ?? "admin"
       }
       return session
     },

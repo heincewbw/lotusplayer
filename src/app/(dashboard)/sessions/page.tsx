@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 
 type SessionEntry = {
   player: { name: string }
@@ -22,6 +23,8 @@ function formatDate(dateStr: string) {
 export default function SessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [loading, setLoading] = useState(true)
+  const { data: authSession } = useSession()
+  const isAdmin = authSession?.user?.role === "admin"
 
   useEffect(() => {
     fetch("/api/sessions")
@@ -89,12 +92,14 @@ export default function SessionsPage() {
                       >
                         Hasil
                       </Link>
-                      <button
-                        onClick={() => handleDelete(s.id)}
-                        className="text-xs text-red-500 dark:text-red-400 hover:text-red-400 dark:hover:text-red-300"
-                      >
-                        Hapus
-                      </button>
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDelete(s.id)}
+                          className="text-xs text-red-500 dark:text-red-400 hover:text-red-400 dark:hover:text-red-300"
+                        >
+                          Hapus
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

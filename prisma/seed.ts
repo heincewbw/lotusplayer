@@ -17,13 +17,26 @@ async function main() {
   const hash = await bcrypt.hash("admin123", 12)
   const user = await prisma.user.upsert({
     where: { email: "admin@lotus.com" },
-    update: {},
+    update: { role: "admin" },
     create: {
       email: "admin@lotus.com",
       password: hash,
+      role: "admin",
     },
   })
   console.log("✓ Admin user:", user.email, "/ password: admin123")
+
+  const hashInput = await bcrypt.hash("input123", 12)
+  const inputUser = await prisma.user.upsert({
+    where: { email: "input@lotus.com" },
+    update: {},
+    create: {
+      email: "input@lotus.com",
+      password: hashInput,
+      role: "input",
+    },
+  })
+  console.log("✓ Input user:", inputUser.email, "/ password: input123")
 
   // Sample players
   const playerNames = ["Jon", "Ridwan", "Willy", "Hendra"]

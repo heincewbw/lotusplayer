@@ -4,6 +4,7 @@ import { useTheme } from "@/components/ThemeProvider"
 import {
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -121,10 +122,16 @@ export default function StatsPage() {
             />
             <Bar
               dataKey="total"
-              fill="#22c55e"
               radius={[4, 4, 0, 0]}
               label={false}
-            />
+            >
+              {playerTotals.map((entry, index) => (
+                <Cell
+                  key={index}
+                  fill={entry.total > 0 ? "#22c55e" : entry.total < 0 ? "#ef4444" : "#94a3b8"}
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>

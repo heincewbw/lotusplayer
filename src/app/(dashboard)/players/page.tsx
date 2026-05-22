@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 type Player = { id: number; name: string }
 
@@ -11,6 +12,8 @@ export default function PlayersPage() {
   const [editName, setEditName] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const { data: authSession } = useSession()
+  const isAdmin = authSession?.user?.role === "admin"
 
   useEffect(() => {
     fetchPlayers()
@@ -135,12 +138,14 @@ export default function PlayersPage() {
                         >
                           Edit
                         </button>
-                        <button
-                          onClick={() => handleDelete(p.id)}
-                          className="text-xs text-red-500 dark:text-red-400 hover:text-red-400 dark:hover:text-red-300"
-                        >
-                          Hapus
-                        </button>
+                        {isAdmin && (
+                          <button
+                            onClick={() => handleDelete(p.id)}
+                            className="text-xs text-red-500 dark:text-red-400 hover:text-red-400 dark:hover:text-red-300"
+                          >
+                            Hapus
+                          </button>
+                        )}
                       </div>
                     )}
                   </td>

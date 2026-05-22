@@ -29,7 +29,7 @@ function fmt(n: number) {
 export default function NewSessionPage() {
   const router = useRouter()
   const [players, setPlayers] = useState<Player[]>([])
-  const [inputMode, setInputMode] = useState<InputMode>("ambilsisa")
+  const [inputMode, setInputMode] = useState<InputMode>("plusminus")
   const today = new Date().toISOString().split("T")[0]
   const [date, setDate] = useState(today)
   const [rows, setRows] = useState<RowData[]>(Array.from({ length: NUM_ROWS }, emptyRow))
@@ -121,17 +121,6 @@ export default function NewSessionPage() {
       <div className="flex gap-2 mb-4">
         <button
           type="button"
-          onClick={() => switchMode("ambilsisa")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            inputMode === "ambilsisa"
-              ? "bg-green-600 text-white"
-              : "bg-gray-100 border border-gray-300 text-gray-600 hover:bg-gray-200 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-600"
-          }`}
-        >
-          Chip Buy / Chip Sisa
-        </button>
-        <button
-          type="button"
           onClick={() => switchMode("plusminus")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             inputMode === "plusminus"
@@ -140,6 +129,17 @@ export default function NewSessionPage() {
           }`}
         >
           +/- Langsung
+        </button>
+        <button
+          type="button"
+          onClick={() => switchMode("ambilsisa")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            inputMode === "ambilsisa"
+              ? "bg-green-600 text-white"
+              : "bg-gray-100 border border-gray-300 text-gray-600 hover:bg-gray-200 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-600"
+          }`}
+        >
+          Chip Buy / Chip Sisa
         </button>
       </div>
 
