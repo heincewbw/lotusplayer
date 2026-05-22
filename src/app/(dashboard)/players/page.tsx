@@ -58,7 +58,7 @@ export default function PlayersPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-slate-800 mb-6">Kelola Player</h1>
+      <h1 className="text-xl font-bold text-slate-100 mb-6">Kelola Player</h1>
 
       {/* Add form */}
       <form onSubmit={handleAdd} className="flex gap-2 mb-6">
@@ -67,7 +67,7 @@ export default function PlayersPage() {
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           placeholder="Nama player baru..."
-          className="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="flex-1 border border-slate-600 rounded-lg px-3 py-2 text-sm bg-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         <button
           type="submit"
@@ -79,24 +79,24 @@ export default function PlayersPage() {
       </form>
 
       {/* Players table */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-slate-800 rounded-xl shadow-sm border border-slate-700 overflow-hidden">
         {players.length === 0 ? (
           <p className="text-slate-400 text-sm text-center py-8">
             Belum ada player. Tambahkan di atas.
           </p>
         ) : (
           <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-slate-700 border-b border-slate-600">
               <tr>
-                <th className="text-left text-xs font-semibold text-slate-500 px-4 py-3">#</th>
-                <th className="text-left text-xs font-semibold text-slate-500 px-4 py-3">Nama Player</th>
-                <th className="text-right text-xs font-semibold text-slate-500 px-4 py-3">Aksi</th>
+                <th className="text-left text-xs font-semibold text-slate-400 px-4 py-3">#</th>
+                <th className="text-left text-xs font-semibold text-slate-400 px-4 py-3">Nama Player</th>
+                <th className="text-right text-xs font-semibold text-slate-400 px-4 py-3">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {players.map((p, i) => (
-                <tr key={p.id} className="border-b border-slate-100 last:border-0">
-                  <td className="px-4 py-3 text-sm text-slate-500">{i + 1}</td>
+                <tr key={p.id} className="border-b border-slate-700 last:border-0">
+                  <td className="px-4 py-3 text-sm text-slate-400">{i + 1}</td>
                   <td className="px-4 py-3">
                     {editId === p.id ? (
                       <input
@@ -104,11 +104,11 @@ export default function PlayersPage() {
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleEdit(p.id)}
-                        className="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="border border-slate-600 rounded px-2 py-1 text-sm bg-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-500"
                         autoFocus
                       />
                     ) : (
-                      <span className="text-sm font-medium text-slate-800">{p.name}</span>
+                      <span className="text-sm font-medium text-slate-100">{p.name}</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -122,7 +122,7 @@ export default function PlayersPage() {
                         </button>
                         <button
                           onClick={() => setEditId(null)}
-                          className="text-xs text-slate-500 hover:text-slate-700"
+                          className="text-xs text-slate-400 hover:text-slate-200"
                         >
                           Batal
                         </button>
@@ -131,13 +131,13 @@ export default function PlayersPage() {
                       <div className="flex gap-3 justify-end">
                         <button
                           onClick={() => { setEditId(p.id); setEditName(p.name) }}
-                          className="text-xs text-blue-600 hover:text-blue-800"
+                          className="text-xs text-blue-400 hover:text-blue-300"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete(p.id)}
-                          className="text-xs text-red-500 hover:text-red-700"
+                          className="text-xs text-red-400 hover:text-red-300"
                         >
                           Hapus
                         </button>
