@@ -23,6 +23,8 @@ function formatDate(dateStr: string) {
 export default function SessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [loading, setLoading] = useState(true)
+  const [filterStart, setFilterStart] = useState("")
+  const [filterEnd, setFilterEnd] = useState("")
   const { data: authSession } = useSession()
   const isAdmin = authSession?.user?.role === "admin"
 
@@ -31,6 +33,13 @@ export default function SessionsPage() {
       .then((r) => r.json())
       .then((data) => { setSessions(data); setLoading(false) })
   }, [])
+
+  const filteredSessions = sessions.filter((s) => {
+    const dateStr = s.date.split("T")[0]
+    if (filterStart && dateStr < filterStart) return false
+    if (filterEnd && dateStr > filterEnd) return false
+    return true
+  })
 
   async function handleDelete(id: number) {
     if (!confirm("Hapus session ini?")) return
@@ -42,7 +51,7 @@ export default function SessionsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold text-gray-900 dark:text-slate-100">Riwayat Session</h1>
         <Link
           href="/sessions/new"
@@ -52,12 +61,47 @@ export default function SessionsPage() {
         </Link>
       </div>
 
-      {sessions.length === 0 ? (
+      {/* Date filter */}
+      <div className="flex items-center gap-2 flex-wrap mb-6">
+        <span className="text-xs text-gray-500 dark:text-slate-400">Filter:</span>
+        <input
+          type="date"
+          value={filterStart}
+          onChange={(e) => setFilterStart(e.target.value)}
+          className="border border-gray-300 dark:border-slate-600 rounded px-2 py-1 text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        <span className="text-xs text-gray-400 dark:text-slate-500">—</span>
+        <input
+          type="date"
+          value={filterEnd}
+          onChange={(e) => setFilterEnd(e.target.value)}
+          className="border border-gray-300 dark:border-slate-600 rounded px-2 py-1 text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        {(filterStart || filterEnd) && (
+          <button
+            onClick={() => { setFilterStart(""); setFilterEnd("") }}
+            className="text-xs text-gray-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 transition-colors"
+          >
+            Reset
+          </button>
+        )}
+        {(filterStart || filterEnd) && (
+          <span className="text-xs text-gray-400 dark:text-slate-500 ml-1">
+            {filteredSessions.length} session
+          </span>
+        )}
+      </div>
+
+      {filteredSessions.length === 0 ? (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-8 text-center">
-          <p className="text-gray-500 dark:text-slate-400 text-sm">Belum ada session.</p>
-          <Link href="/sessions/new" className="text-green-600 dark:text-green-400 text-sm mt-2 inline-block hover:underline">
-            Buat session pertama →
-          </Link>
+          <p className="text-gray-500 dark:text-slate-400 text-sm">
+            {filterStart || filterEnd ? "Tidak ada session dalam periode ini." : "Belum ada session."}
+          </p>
+          {!filterStart && !filterEnd && (
+            <Link href="/sessions/new" className="text-green-600 dark:text-green-400 text-sm mt-2 inline-block hover:underline">
+              Buat session pertama →
+            </Link>
+          )}
         </div>
       ) : (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
@@ -70,13 +114,30 @@ export default function SessionsPage() {
               </tr>
             </thead>
             <tbody>
-              {sessions.map((s) => (
+              {filteredSessions.map((s) => (
                 <tr key={s.id} className="border-b border-gray-100 dark:border-slate-700 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700">
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-slate-100">
                     {formatDate(s.date)}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-300">
-                    {s.entries.map((e) => e.player.name).join(", ")}
+                  <td className="px-4 py-3 text-sm">
+                    {(() => {
+                      const pls = s.entries.map((e) => e.sisa - e.ambil)
+                      const maxPl = Math.max(...pls)
+                      const minPl = Math.min(...pls)
+                      return s.entries.map((e, i) => {
+                        const pl = e.sisa - e.ambil
+                        const isWinner = pl === maxPl && maxPl > 0
+                        const isLoser = pl === minPl && minPl < 0
+                        return (
+                          <span key={e.player.name}>
+                            {i > 0 && <span className="text-gray-400 dark:text-slate-500">, </span>}
+                            <span className={isWinner ? "text-green-600 dark:text-green-400 font-medium" : isLoser ? "text-red-500 dark:text-red-400 font-medium" : "text-gray-600 dark:text-slate-300"}>
+                              {e.player.name}
+                            </span>
+                          </span>
+                        )
+                      })
+                    })()}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex gap-3 justify-end">

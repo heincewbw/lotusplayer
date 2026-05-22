@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 
 type Entry = {
   player: { name: string }
@@ -29,6 +30,8 @@ function fmt(n: number) {
 export default function SessionDetailPage() {
   const { id } = useParams()
   const [session, setSession] = useState<Session | null>(null)
+  const { data: authSession } = useSession()
+  const isAdmin = authSession?.user?.role === "admin"
 
   useEffect(() => {
     fetch(`/api/sessions/${id}`)
@@ -46,6 +49,14 @@ export default function SessionDetailPage() {
           <p className="text-gray-500 dark:text-slate-400 text-sm">{formatDate(session.date)}</p>
         </div>
         <div className="flex gap-2">
+          {isAdmin && (
+            <Link
+              href={`/sessions/${session.id}/edit`}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
+            >
+              Edit
+            </Link>
+          )}
           <Link
             href={`/result/${session.id}`}
             className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"

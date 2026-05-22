@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
+import Link from "next/link"
 
 type Player = { id: number; name: string }
 
@@ -111,7 +112,12 @@ export default function PlayersPage() {
                         autoFocus
                       />
                     ) : (
-                      <span className="text-sm font-medium text-gray-900 dark:text-slate-100">{p.name}</span>
+                      <Link
+                        href={`/players/${p.id}`}
+                        className="text-sm font-medium text-gray-900 dark:text-slate-100 hover:text-green-600 dark:hover:text-green-400 hover:underline"
+                      >
+                        {p.name}
+                      </Link>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right">

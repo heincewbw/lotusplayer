@@ -2,34 +2,24 @@ import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 
-export async function GET() {
+export async function GET(req: Request) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  // All-time totals per player
-  const entries = await prisma.sessionEntry.findMany({
-    include: { player: true },
-  })
+  const { searchParams } = new URL(req.url)
+  const start = searchParams.get("start")
+  const end = searchParams.get("end")
 
-  const totalsMap = new Map<number, { name: string; total: number; wins: number; losses: number }>()
-  for (const e of entries) {
-    const pl = e.sisa - e.ambil
-    const existing = totalsMap.get(e.playerId) ?? {
-      name: e.player.name,
-      total: 0,
-      wins: 0,
-      losses: 0,
-    }
-    existing.total += pl
-    if (pl > 0) existing.wins++
-    else if (pl < 0) existing.losses++
-    totalsMap.set(e.playerId, existing)
+  const dateFilter: { gte?: Date; lte?: Date } = {}
+  if (start) dateFilter.gte = new Date(start)
+  if (end) {
+    const d = new Date(end)
+    d.setHours(23, 59, 59, 999)
+    dateFilter.lte = d
   }
 
-  const playerTotals = Array.from(totalsMap.values()).sort((a, b) => b.total - a.total)
-
-  // Session trend data
   const sessions = await prisma.session.findMany({
+    where: Object.keys(dateFilter).length > 0 ? { date: dateFilter } : undefined,
     orderBy: { date: "asc" },
     include: {
       entries: {
@@ -38,6 +28,28 @@ export async function GET() {
       },
     },
   })
+
+  // Compute totals from filtered sessions
+  const totalsMap = new Map<number, { name: string; total: number; wins: number; losses: number; played: number }>()
+  for (const s of sessions) {
+    for (const e of s.entries) {
+      const pl = e.sisa - e.ambil
+      const existing = totalsMap.get(e.playerId) ?? {
+        name: e.player.name,
+        total: 0,
+        wins: 0,
+        losses: 0,
+        played: 0,
+      }
+      existing.total += pl
+      existing.played++
+      if (pl > 0) existing.wins++
+      else if (pl < 0) existing.losses++
+      totalsMap.set(e.playerId, existing)
+    }
+  }
+
+  const playerTotals = Array.from(totalsMap.values()).sort((a, b) => b.total - a.total)
 
   const trend = sessions.map((s) => {
     const row: Record<string, string | number> = {

@@ -20,6 +20,7 @@ type PlayerTotal = {
   total: number
   wins: number
   losses: number
+  played: number
 }
 
 type TrendRow = Record<string, string | number>
@@ -30,26 +31,46 @@ export default function StatsPage() {
   const [playerTotals, setPlayerTotals] = useState<PlayerTotal[]>([])
   const [trend, setTrend] = useState<TrendRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
   const { theme } = useTheme()
   const isDark = theme === "dark"
 
   useEffect(() => {
-    fetch("/api/stats")
+    setLoading(true)
+    const params = new URLSearchParams()
+    if (startDate) params.set("start", startDate)
+    if (endDate) params.set("end", endDate)
+    const url = `/api/stats${params.toString() ? "?" + params.toString() : ""}`
+    fetch(url)
       .then((r) => r.json())
       .then((data) => {
         setPlayerTotals(data.playerTotals)
         setTrend(data.trend)
         setLoading(false)
       })
-  }, [])
+  }, [startDate, endDate])
 
   if (loading) return <p className="text-gray-400 dark:text-slate-400 text-sm">Loading...</p>
 
   if (playerTotals.length === 0) {
     return (
-      <div>
-        <h1 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-4">Statistik</h1>
-        <p className="text-gray-500 dark:text-slate-400 text-sm">Belum ada data session.</p>
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-slate-100">Statistik</h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs text-gray-500 dark:text-slate-400">Periode:</span>
+            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="border border-gray-300 dark:border-slate-600 rounded px-2 py-1 text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
+            <span className="text-xs text-gray-400 dark:text-slate-500">—</span>
+            <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="border border-gray-300 dark:border-slate-600 rounded px-2 py-1 text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
+            {(startDate || endDate) && (
+              <button onClick={() => { setStartDate(""); setEndDate("") }} className="text-xs text-gray-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400">Reset</button>
+            )}
+          </div>
+        </div>
+        <p className="text-gray-500 dark:text-slate-400 text-sm">
+          {startDate || endDate ? "Tidak ada data untuk periode ini." : "Belum ada data session."}
+        </p>
       </div>
     )
   }
@@ -65,7 +86,33 @@ export default function StatsPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-xl font-bold text-gray-900 dark:text-slate-100">Statistik</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-slate-100">Statistik</h1>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-gray-500 dark:text-slate-400">Periode:</span>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border border-gray-300 dark:border-slate-600 rounded px-2 py-1 text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+          <span className="text-xs text-gray-400 dark:text-slate-500">—</span>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border border-gray-300 dark:border-slate-600 rounded px-2 py-1 text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+          {(startDate || endDate) && (
+            <button
+              onClick={() => { setStartDate(""); setEndDate("") }}
+              className="text-xs text-gray-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 transition-colors"
+            >
+              Reset
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Ranking table */}
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
@@ -78,6 +125,7 @@ export default function StatsPage() {
               <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2">Rank</th>
               <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2">Player</th>
               <th className="text-right text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2">Total P/L</th>
+              <th className="text-right text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2">Total Main</th>
               <th className="text-right text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2">Menang</th>
               <th className="text-right text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2">Kalah</th>
             </tr>
@@ -94,6 +142,7 @@ export default function StatsPage() {
                 >
                   {p.total > 0 ? `+${p.total.toLocaleString()}` : p.total.toLocaleString()}
                 </td>
+                <td className="px-4 py-3 text-sm text-right text-gray-700 dark:text-slate-300">{p.played}</td>
                 <td className="px-4 py-3 text-sm text-right text-green-600 dark:text-green-400">{p.wins}</td>
                 <td className="px-4 py-3 text-sm text-right text-red-500 dark:text-red-400">{p.losses}</td>
               </tr>

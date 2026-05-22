@@ -1,10 +1,10 @@
 "use client"
 import Link from "next/link"
-import { signOut } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import { usePathname } from "next/navigation"
 import { useTheme } from "@/components/ThemeProvider"
 
-const links = [
+const baseLinks = [
   { href: "/sessions", label: "Sessions" },
   { href: "/sessions/new", label: "+ New Session" },
   { href: "/players", label: "Players" },
@@ -14,6 +14,12 @@ const links = [
 export default function NavBar() {
   const pathname = usePathname()
   const { theme, toggle } = useTheme()
+  const { data: authSession } = useSession()
+  const isAdmin = authSession?.user?.role === "admin"
+
+  const links = isAdmin
+    ? [...baseLinks, { href: "/users", label: "Users" }]
+    : baseLinks
 
   return (
     <nav className="bg-white border-b border-gray-200 dark:bg-slate-800 dark:border-transparent text-gray-900 dark:text-white px-4 py-3 shadow-sm dark:shadow-md">
