@@ -35,12 +35,12 @@ export default function SessionsPage() {
     setSessions((prev) => prev.filter((s) => s.id !== id))
   }
 
-  if (loading) return <p className="text-slate-500 text-sm">Loading...</p>
+  if (loading) return <p className="text-gray-400 dark:text-slate-500 text-sm">Loading...</p>
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-slate-100">Riwayat Session</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-slate-100">Riwayat Session</h1>
         <Link
           href="/sessions/new"
           className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
@@ -50,48 +50,48 @@ export default function SessionsPage() {
       </div>
 
       {sessions.length === 0 ? (
-        <div className="bg-slate-800 rounded-xl shadow-sm border border-slate-700 p-8 text-center">
-          <p className="text-slate-400 text-sm">Belum ada session.</p>
-          <Link href="/sessions/new" className="text-green-400 text-sm mt-2 inline-block hover:underline">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-8 text-center">
+          <p className="text-gray-500 dark:text-slate-400 text-sm">Belum ada session.</p>
+          <Link href="/sessions/new" className="text-green-600 dark:text-green-400 text-sm mt-2 inline-block hover:underline">
             Buat session pertama →
           </Link>
         </div>
       ) : (
-        <div className="bg-slate-800 rounded-xl shadow-sm border border-slate-700 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
           <table className="w-full">
-            <thead className="bg-slate-700 border-b border-slate-600">
+            <thead className="bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
               <tr>
-                <th className="text-left text-xs font-semibold text-slate-400 px-4 py-3">Tanggal</th>
-                <th className="text-left text-xs font-semibold text-slate-400 px-4 py-3">Players</th>
-                <th className="text-right text-xs font-semibold text-slate-400 px-4 py-3">Aksi</th>
+                <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-3">Tanggal</th>
+                <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-3">Players</th>
+                <th className="text-right text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-3">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {sessions.map((s) => (
-                <tr key={s.id} className="border-b border-slate-700 last:border-0 hover:bg-slate-700">
-                  <td className="px-4 py-3 text-sm font-medium text-slate-100">
+                <tr key={s.id} className="border-b border-gray-100 dark:border-slate-700 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-slate-100">
                     {formatDate(s.date)}
                   </td>
-                  <td className="px-4 py-3 text-sm text-slate-300">
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-300">
                     {s.entries.map((e) => e.player.name).join(", ")}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex gap-3 justify-end">
                       <Link
                         href={`/sessions/${s.id}`}
-                        className="text-xs text-blue-400 hover:text-blue-300"
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
                       >
                         Detail
                       </Link>
                       <Link
                         href={`/result/${s.id}`}
-                        className="text-xs text-green-400 hover:text-green-300"
+                        className="text-xs text-green-600 dark:text-green-400 hover:text-green-500 dark:hover:text-green-300"
                       >
                         Hasil
                       </Link>
                       <button
                         onClick={() => handleDelete(s.id)}
-                        className="text-xs text-red-400 hover:text-red-300"
+                        className="text-xs text-red-500 dark:text-red-400 hover:text-red-400 dark:hover:text-red-300"
                       >
                         Hapus
                       </button>
