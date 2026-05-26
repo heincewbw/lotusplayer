@@ -249,7 +249,7 @@ export default function EditSessionPage() {
                   <div className="flex items-center">
                     <button
                       type="button"
-                      onClick={() => toggleSign(i)}
+                      onPointerDown={(e) => { e.preventDefault(); toggleSign(i) }}
                       className={`flex-shrink-0 w-8 h-full py-2 text-base font-bold border-r border-gray-100 dark:border-slate-700 select-none ${
                         row.pl.startsWith("-")
                           ? "text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20"
