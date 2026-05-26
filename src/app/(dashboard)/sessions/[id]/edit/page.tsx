@@ -80,15 +80,6 @@ export default function EditSessionPage() {
     setRows(Array.from({ length: NUM_ROWS }, emptyRow))
   }
 
-  function toggleSign(i: number) {
-    setRows((prev) => prev.map((r, idx) => {
-      if (idx !== i) return r
-      const val = r.pl
-      if (val.startsWith("-")) return { ...r, pl: val.slice(1) }
-      return { ...r, pl: val ? "-" + val : "-" }
-    }))
-  }
-
   const filledRows = rows.filter((r) => {
     if (inputMode === "plusminus") return r.playerId && r.pl !== ""
     return r.playerId && r.ambil && r.sisa
@@ -246,27 +237,21 @@ export default function EditSessionPage() {
                       ))}
                     </select>
                   </div>
-                  <div className="flex items-center">
-                    <button
-                      type="button"
-                      onClick={() => toggleSign(i)}
-                      className={`flex-shrink-0 w-8 h-full py-2 text-base font-bold border-r border-gray-100 dark:border-slate-700 select-none ${
-                        row.pl.startsWith("-")
-                          ? "text-yellow-500 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20"
-                          : "text-gray-400 dark:text-slate-500 bg-white dark:bg-slate-800"
-                      }`}
-                    >
-                      −
-                    </button>
+                  <div>
                     <input
                       type="text"
-                      inputMode="numeric"
-                      value={row.pl.startsWith("-") ? row.pl.slice(1) : row.pl}
+                      inputMode="decimal"
+                      value={row.pl}
                       onChange={(e) => {
-                        const digits = e.target.value.replace(/[^0-9]/g, "")
-                        const isNeg = row.pl.startsWith("-")
-                        updateRow(i, "pl", isNeg ? (digits ? "-" + digits : "-") : digits)
+                        const val = e.target.value.replace(/[^0-9-]/g, "").replace(/(?!^)-/g, "")
+                        updateRow(i, "pl", val)
                       }}
+                      className={`w-full px-2 py-2 text-sm text-right bg-white dark:bg-slate-800 focus:outline-none focus:bg-gray-50 dark:focus:bg-slate-700 font-medium ${
+                        pl === null ? "text-gray-900 dark:text-slate-100" : pl > 0 ? "text-green-600 dark:text-green-400" : pl < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-slate-500"
+                      }`}
+                      placeholder="0"
+                    />
+                  </div>
                       className={`flex-1 min-w-0 px-2 py-2 text-sm text-right bg-white dark:bg-slate-800 focus:outline-none focus:bg-gray-50 dark:focus:bg-slate-700 font-medium ${
                         pl === null ? "text-gray-900 dark:text-slate-100" : pl > 0 ? "text-green-600 dark:text-green-400" : pl < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-slate-500"
                       }`}
