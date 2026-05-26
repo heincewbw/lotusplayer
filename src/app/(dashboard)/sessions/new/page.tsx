@@ -215,10 +215,10 @@ export default function NewSessionPage() {
                   <div className="flex items-center">
                     <button
                       type="button"
-                      onPointerDown={(e) => { e.preventDefault(); toggleSign(i) }}
+                      onClick={() => toggleSign(i)}
                       className={`flex-shrink-0 w-8 h-full py-2 text-base font-bold border-r border-gray-100 dark:border-slate-700 select-none ${
                         row.pl.startsWith("-")
-                          ? "text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20"
+                          ? "text-yellow-500 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20"
                           : "text-gray-400 dark:text-slate-500 bg-white dark:bg-slate-800"
                       }`}
                     >
