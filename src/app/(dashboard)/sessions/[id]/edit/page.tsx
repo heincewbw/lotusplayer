@@ -84,9 +84,8 @@ export default function EditSessionPage() {
     setRows((prev) => prev.map((r, idx) => {
       if (idx !== i) return r
       const val = r.pl
-      if (!val) return r
       if (val.startsWith("-")) return { ...r, pl: val.slice(1) }
-      return { ...r, pl: "-" + val }
+      return { ...r, pl: val ? "-" + val : "-" }
     }))
   }
 
@@ -265,7 +264,8 @@ export default function EditSessionPage() {
                       value={row.pl.startsWith("-") ? row.pl.slice(1) : row.pl}
                       onChange={(e) => {
                         const digits = e.target.value.replace(/[^0-9]/g, "")
-                        updateRow(i, "pl", row.pl.startsWith("-") && digits ? "-" + digits : digits)
+                        const isNeg = row.pl.startsWith("-")
+                        updateRow(i, "pl", isNeg ? (digits ? "-" + digits : "-") : digits)
                       }}
                       className={`flex-1 min-w-0 px-2 py-2 text-sm text-right bg-white dark:bg-slate-800 focus:outline-none focus:bg-gray-50 dark:focus:bg-slate-700 font-medium ${
                         pl === null ? "text-gray-900 dark:text-slate-100" : pl > 0 ? "text-green-600 dark:text-green-400" : pl < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-slate-500"
