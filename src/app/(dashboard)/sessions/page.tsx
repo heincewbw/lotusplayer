@@ -125,7 +125,7 @@ export default function SessionsPage() {
                       const maxPl = Math.max(...pls)
                       const minPl = Math.min(...pls)
                       return sorted.map((e, i) => {
-                        const pl = e.sisa - e.ambil
+                        const pl = e.pl
                         const isWinner = pl === maxPl && maxPl > 0
                         const isLoser = pl === minPl && minPl < 0
                         return (
