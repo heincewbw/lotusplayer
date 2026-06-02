@@ -9,6 +9,12 @@
 import mysql from "mysql2/promise"
 import { execSync } from "child_process"
 
+// Absolute safety net — process MUST exit within 120s no matter what
+setTimeout(() => {
+  console.error("⚠  db-migrate: safety timeout, forcing exit")
+  process.exit(0)
+}, 120_000).unref()
+
 async function migrate() {
   const dbUrl = new URL(process.env.DATABASE_URL)
 
@@ -59,7 +65,8 @@ async function migrate() {
   // Sync schema to DB (drops old columns, creates missing tables, etc.)
   console.log("⚙  Syncing Prisma schema ...")
   execSync("node_modules/.bin/prisma db push --accept-data-loss --skip-generate", {
-    stdio: "inherit",
+    stdio: ["ignore", "inherit", "inherit"],
+    timeout: 90_000,
   })
   console.log("✓  Schema sync complete")
 }
