@@ -119,7 +119,8 @@ export default function StatsPage() {
         <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-700">
           <h2 className="font-semibold text-gray-800 dark:text-slate-200 text-sm">Ranking All-Time</h2>
         </div>
-        <table className="w-full">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[380px]">
           <thead>
             <tr className="border-b border-gray-100 dark:border-slate-700">
               <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2">Rank</th>
@@ -149,6 +150,7 @@ export default function StatsPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Bar chart - total P/L */}
