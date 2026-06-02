@@ -5,8 +5,7 @@ import { useSession } from "next-auth/react"
 
 type SessionEntry = {
   player: { name: string }
-  ambil: number
-  sisa: number
+  pl: number
 }
 
 type Session = {
@@ -121,8 +120,8 @@ export default function SessionsPage() {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     {(() => {
-                      const sorted = [...s.entries].sort((a, b) => (b.sisa - b.ambil) - (a.sisa - a.ambil))
-                      const pls = sorted.map((e) => e.sisa - e.ambil)
+                      const sorted = [...s.entries].sort((a, b) => b.pl - a.pl)
+                      const pls = sorted.map((e) => e.pl)
                       const maxPl = Math.max(...pls)
                       const minPl = Math.min(...pls)
                       return sorted.map((e, i) => {

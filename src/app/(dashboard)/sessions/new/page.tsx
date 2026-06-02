@@ -174,9 +174,7 @@ export default function NewSessionPage() {
       .filter((row) => row.playerId && getPL(row) !== null)
       .map((row) => {
         const pl = parseInt(row.pl)
-        const ambil = pl < 0 ? -pl : 0
-        const sisa = pl > 0 ? pl : 0
-        return { playerId: parseInt(row.playerId), rowNumber: row.rowNumber, ambil, sisa }
+        return { playerId: parseInt(row.playerId), rowNumber: row.rowNumber, pl }
       })
 
     const res = await fetch("/api/sessions", {

@@ -7,8 +7,7 @@ import { useSession } from "next-auth/react"
 type Entry = {
   player: { name: string }
   rowNumber: number
-  ambil: number
-  sisa: number
+  pl: number
 }
 
 type Session = {
@@ -89,7 +88,7 @@ export default function SessionDetailPage() {
         </div>
 
         {session.entries.map((e, i) => {
-          const pl = e.sisa - e.ambil
+          const pl = e.pl
           return (
             <div
               key={i}
@@ -113,7 +112,7 @@ export default function SessionDetailPage() {
         </div>
         {(() => {
           const totalMain = session.entries.reduce((sum, e) => {
-            const pl = e.sisa - e.ambil
+            const pl = e.pl
             return pl > 0 ? sum + pl : sum
           }, 0)
           return totalMain > 0 ? (

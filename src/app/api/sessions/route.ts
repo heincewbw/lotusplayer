@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
   // Server-side balance validation
   const balance = entries.reduce(
-    (sum: number, e: { ambil: number; sisa: number }) => sum + (e.sisa - e.ambil),
+    (sum: number, e: { pl: number }) => sum + e.pl,
     0
   )
   if (balance !== 0) {
@@ -52,11 +52,10 @@ export async function POST(req: Request) {
       notes: notes ?? null,
       createdBy: session.user!.id!,
       entries: {
-        create: entries.map((e: { playerId: number; rowNumber: number; ambil: number; sisa: number }) => ({
+        create: entries.map((e: { playerId: number; rowNumber: number; pl: number }) => ({
           playerId: e.playerId,
           rowNumber: e.rowNumber,
-          ambil: e.ambil,
-          sisa: e.sisa,
+          pl: e.pl,
         })),
       },
     },

@@ -40,6 +40,5 @@ model SessionEntry {
   playerId  Int
   player    Player  @relation(fields: [playerId], references: [id])
   rowNumber Int
-  ambil     Int
-  sisa      Int
+  pl        Int
 }

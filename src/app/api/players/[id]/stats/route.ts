@@ -26,15 +26,13 @@ export async function GET(
   let losses = 0
 
   const sessions = entries.map((e) => {
-    const pl = e.sisa - e.ambil
+    const pl = e.pl
     total += pl
     if (pl > 0) wins++
     else if (pl < 0) losses++
     return {
       sessionId: e.sessionId,
       date: e.session.date.toISOString().split("T")[0],
-      ambil: e.ambil,
-      sisa: e.sisa,
       pl,
     }
   })

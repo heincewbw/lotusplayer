@@ -3,8 +3,7 @@ import Link from "next/link"
 
 type Entry = {
   rowNumber: number
-  ambil: number
-  sisa: number
+  pl: number
   player: { name: string }
 }
 
@@ -30,7 +29,7 @@ function buildWhatsAppText(session: Session): string {
     .slice()
     .sort((a, b) => a.rowNumber - b.rowNumber)
     .map((e) => {
-      const pl = e.sisa - e.ambil
+      const pl = e.pl
       return `${e.player.name}: ${fmt(pl)}`
     })
   const lines: string[] = [
@@ -75,7 +74,7 @@ export default function ResultView({ session }: { session: Session }) {
           {/* All 9 rows (filled + empty) */}
           {Array.from({ length: 9 }, (_, i) => {
             const entry = session.entries.find((e) => e.rowNumber === i + 1)
-            const pl = entry ? entry.sisa - entry.ambil : null
+            const pl = entry ? entry.pl : null
             return (
               <div
                 key={i}
@@ -115,7 +114,7 @@ export default function ResultView({ session }: { session: Session }) {
           </div>
           {(() => {
             const totalMain = session.entries.reduce((sum, e) => {
-              const pl = e.sisa - e.ambil
+              const pl = e.pl
               return pl > 0 ? sum + pl : sum
             }, 0)
             return totalMain > 0 ? (

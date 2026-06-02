@@ -33,7 +33,7 @@ export async function GET(req: Request) {
   const totalsMap = new Map<number, { name: string; total: number; wins: number; losses: number; played: number }>()
   for (const s of sessions) {
     for (const e of s.entries) {
-      const pl = e.sisa - e.ambil
+      const pl = e.pl
       const existing = totalsMap.get(e.playerId) ?? {
         name: e.player.name,
         total: 0,
@@ -56,7 +56,7 @@ export async function GET(req: Request) {
       date: s.date.toISOString().split("T")[0],
     }
     for (const e of s.entries) {
-      row[e.player.name] = e.sisa - e.ambil
+      row[e.player.name] = e.pl
     }
     return row
   })

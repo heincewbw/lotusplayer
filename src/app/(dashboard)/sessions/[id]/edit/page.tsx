@@ -141,10 +141,9 @@ export default function EditSessionPage() {
       for (const e of (sessionData.entries as EntryDetail[])) {
         const idx = e.rowNumber - 1
         if (idx >= 0 && idx < MAX_ROWS) {
-          const pl = e.sisa - e.ambil
           newRows[idx] = {
             playerId: String(e.player.id),
-            pl: String(pl),
+            pl: String(e.pl),
           }
         }
       }
@@ -192,9 +191,7 @@ export default function EditSessionPage() {
       .filter((row) => row.playerId && getPL(row) !== null)
       .map((row) => {
         const pl = parseInt(row.pl)
-        const ambil = pl < 0 ? -pl : 0
-        const sisa = pl > 0 ? pl : 0
-        return { playerId: parseInt(row.playerId), rowNumber: row.rowNumber, ambil, sisa }
+        return { playerId: parseInt(row.playerId), rowNumber: row.rowNumber, pl }
       })
 
     const res = await fetch(`/api/sessions/${id}`, {

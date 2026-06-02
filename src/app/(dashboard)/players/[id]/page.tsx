@@ -16,8 +16,6 @@ import {
 type SessionRow = {
   sessionId: number
   date: string
-  ambil: number
-  sisa: number
   pl: number
 }
 
@@ -154,8 +152,6 @@ export default function PlayerDetailPage() {
               <tr className="border-b border-gray-100 dark:border-slate-700">
                 <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2">#</th>
                 <th className="text-left text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2">Tanggal</th>
-                <th className="text-right text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2">Ambil</th>
-                <th className="text-right text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2">Sisa</th>
                 <th className="text-right text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2">P/L</th>
                 <th className="text-right text-xs font-semibold text-gray-500 dark:text-slate-400 px-4 py-2"></th>
               </tr>
@@ -165,8 +161,6 @@ export default function PlayerDetailPage() {
                 <tr key={s.sessionId} className="border-b border-gray-100 dark:border-slate-700 last:border-0">
                   <td className="px-4 py-3 text-sm text-gray-400 dark:text-slate-500">{sessions.length - i}</td>
                   <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-100">{formatDate(s.date)}</td>
-                  <td className="px-4 py-3 text-sm text-right text-gray-700 dark:text-slate-300">{s.ambil.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-sm text-right text-gray-700 dark:text-slate-300">{s.sisa.toLocaleString()}</td>
                   <td className={`px-4 py-3 text-sm font-semibold text-right ${s.pl > 0 ? "text-green-600 dark:text-green-400" : s.pl < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-slate-500"}`}>
                     {fmt(s.pl)}
                   </td>
