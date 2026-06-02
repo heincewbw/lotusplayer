@@ -18,6 +18,7 @@ async function migrate() {
     user: decodeURIComponent(dbUrl.username),
     password: decodeURIComponent(dbUrl.password),
     database: dbUrl.pathname.slice(1),
+    connectTimeout: 10000,
   })
 
   try {
@@ -68,3 +69,5 @@ try {
 } catch (err) {
   console.error("⚠  db-migrate error (app will still start):", err.message)
 }
+
+process.exit(0)
