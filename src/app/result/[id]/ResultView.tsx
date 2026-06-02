@@ -104,15 +104,31 @@ export default function ResultView({ session }: { session: Session }) {
             )
           })}
 
-          {/* Balance footer */}
+          {/* Balance + Total footer */}
           <div className="grid grid-cols-[2.5rem_1fr_6rem] border-t-2 border-gray-300 dark:border-slate-600 bg-gray-100 dark:bg-slate-700">
-            <div className="col-span-2 px-4 py-3 text-sm font-bold text-gray-700 dark:text-slate-300 text-right border-r border-gray-200 dark:border-slate-600">
+            <div className="col-span-2 px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-slate-300 text-right border-r border-gray-200 dark:border-slate-600">
               Balance
             </div>
-            <div className="px-2 py-3 text-sm font-bold text-gray-700 dark:text-slate-300 text-right">
+            <div className="px-2 py-2.5 text-sm font-bold text-gray-700 dark:text-slate-300 text-right">
               0
             </div>
           </div>
+          {(() => {
+            const totalMain = session.entries.reduce((sum, e) => {
+              const pl = e.sisa - e.ambil
+              return pl > 0 ? sum + pl : sum
+            }, 0)
+            return totalMain > 0 ? (
+              <div className="grid grid-cols-[2.5rem_1fr_6rem] border-t border-gray-200 dark:border-slate-600 bg-gray-100 dark:bg-slate-700">
+                <div className="col-span-2 px-4 py-2 text-xs text-gray-500 dark:text-slate-400 text-right border-r border-gray-200 dark:border-slate-600">
+                  Total Main
+                </div>
+                <div className="px-2 py-2 text-xs font-semibold text-gray-600 dark:text-slate-300 text-right">
+                  {totalMain.toLocaleString()}
+                </div>
+              </div>
+            ) : null
+          })()}
         </div>
 
         {/* Notes */}

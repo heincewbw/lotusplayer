@@ -121,10 +121,11 @@ export default function SessionsPage() {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     {(() => {
-                      const pls = s.entries.map((e) => e.sisa - e.ambil)
+                      const sorted = [...s.entries].sort((a, b) => (b.sisa - b.ambil) - (a.sisa - a.ambil))
+                      const pls = sorted.map((e) => e.sisa - e.ambil)
                       const maxPl = Math.max(...pls)
                       const minPl = Math.min(...pls)
-                      return s.entries.map((e, i) => {
+                      return sorted.map((e, i) => {
                         const pl = e.sisa - e.ambil
                         const isWinner = pl === maxPl && maxPl > 0
                         const isLoser = pl === minPl && minPl < 0

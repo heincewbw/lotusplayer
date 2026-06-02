@@ -148,11 +148,16 @@ export default function NewSessionPage() {
     setRows((prev) => [...prev, emptyRow()])
   }
 
-  const filledRows = rows.filter((r) => r.playerId && r.pl !== "")
+  const filledRows = rows.filter((r) => r.playerId && getPL(r) !== null)
 
   const balance = rows.reduce((sum, row) => {
     const pl = getPL(row)
     return pl !== null ? sum + pl : sum
+  }, 0)
+
+  const totalMain = rows.reduce((sum, row) => {
+    const pl = getPL(row)
+    return pl !== null && pl > 0 ? sum + pl : sum
   }, 0)
 
   const isBalanced = balance === 0
@@ -166,7 +171,7 @@ export default function NewSessionPage() {
 
     const entries = rows
       .map((row, i) => ({ ...row, rowNumber: i + 1 }))
-      .filter((row) => row.playerId && row.pl !== "")
+      .filter((row) => row.playerId && getPL(row) !== null)
       .map((row) => {
         const pl = parseInt(row.pl)
         const ambil = pl < 0 ? -pl : 0
@@ -288,17 +293,27 @@ export default function NewSessionPage() {
             </div>
           )}
 
-          {/* Balance footer row */}
+          {/* Balance + Total footer */}
           <div className="grid grid-cols-[2.5rem_1fr_7rem] bg-gray-50 dark:bg-slate-700 border-t-2 border-gray-200 dark:border-slate-600">
-            <div className="col-span-2 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-slate-300 text-right border-r border-gray-200 dark:border-slate-600">
+            <div className="col-span-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-slate-300 text-right border-r border-gray-200 dark:border-slate-600">
               Balance
             </div>
-            <div className="px-2 py-3 flex items-center justify-end">
+            <div className="px-2 py-2 flex items-center justify-end">
               <span className={`text-sm font-bold ${isBalanced ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}`}>
                 {isBalanced ? "0 ✓" : fmt(balance)}
               </span>
             </div>
           </div>
+          {totalMain > 0 && (
+            <div className="grid grid-cols-[2.5rem_1fr_7rem] bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+              <div className="col-span-2 px-4 py-2 text-xs text-gray-500 dark:text-slate-400 text-right border-r border-gray-200 dark:border-slate-600">
+                Total Main
+              </div>
+              <div className="px-2 py-2 flex items-center justify-end">
+                <span className="text-xs font-semibold text-gray-600 dark:text-slate-300">{totalMain.toLocaleString()}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Notes / Catatan */}
@@ -354,6 +369,9 @@ export default function NewSessionPage() {
           <p className={`text-sm font-bold leading-tight ${isBalanced ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}`}>
             {isBalanced ? "0 ✓" : fmt(balance)}
           </p>
+          {totalMain > 0 && (
+            <p className="text-xs text-gray-400 dark:text-slate-500 leading-tight">Total: {totalMain.toLocaleString()}</p>
+          )}
         </div>
         <button
           type="button"
