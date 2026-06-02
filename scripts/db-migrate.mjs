@@ -3,7 +3,7 @@
  * Runs before `next start`. Handles the one-time migration of
  * ambil/sisa columns → pl column, then syncs schema with prisma db push.
  *
- * Safe to run multiple times (idempotent).
+ * Fully idempotent — safe to run multiple times.
  */
 import mysql from "mysql2/promise"
 import { execSync } from "child_process"
@@ -19,24 +19,34 @@ const connection = await mysql.createConnection({
 })
 
 try {
-  // Check if the old `ambil` column still exists
-  const [rows] = await connection.execute(
-    `SELECT COUNT(*) AS cnt
+  // Check which legacy columns still exist
+  const [colRows] = await connection.execute(
+    `SELECT COLUMN_NAME
      FROM information_schema.COLUMNS
      WHERE TABLE_SCHEMA = DATABASE()
        AND TABLE_NAME = 'SessionEntry'
-       AND COLUMN_NAME = 'ambil'`
+       AND COLUMN_NAME IN ('ambil', 'sisa', 'pl')`
   )
-  const hasAmbil = rows[0].cnt > 0
+  const existingCols = colRows.map((r) => r.COLUMN_NAME)
+  const hasAmbil = existingCols.includes("ambil")
+  const hasPl = existingCols.includes("pl")
 
   if (hasAmbil) {
     console.log("⚙  Migrating SessionEntry: ambil/sisa → pl ...")
-    await connection.execute(
-      `ALTER TABLE SessionEntry ADD COLUMN pl INT NOT NULL DEFAULT 0`
-    )
+
+    // Add pl column only if it doesn't exist yet
+    if (!hasPl) {
+      await connection.execute(
+        `ALTER TABLE SessionEntry ADD COLUMN pl INT NOT NULL DEFAULT 0`
+      )
+      console.log("  + Added pl column")
+    }
+
+    // Copy data from ambil/sisa → pl
     await connection.execute(
       `UPDATE SessionEntry SET pl = sisa - ambil`
     )
+    console.log("  + Data migrated (pl = sisa - ambil)")
     // ambil and sisa will be dropped by prisma db push below
     console.log("✓  Data migration complete")
   } else {
@@ -48,7 +58,7 @@ try {
 
 // Sync schema to DB (creates tables on fresh DB, drops old columns, etc.)
 console.log("⚙  Syncing Prisma schema ...")
-execSync("npx prisma db push --accept-data-loss --skip-generate", {
+execSync("node_modules/.bin/prisma db push --accept-data-loss --skip-generate", {
   stdio: "inherit",
 })
 console.log("✓  Schema sync complete")
