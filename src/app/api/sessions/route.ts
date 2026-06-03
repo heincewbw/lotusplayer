@@ -6,17 +6,21 @@ export async function GET() {
   const session = await auth()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const sessions = await prisma.session.findMany({
-    orderBy: { date: "desc" },
-    include: {
-      entries: {
-        include: { player: true },
-        orderBy: { rowNumber: "asc" },
+  try {
+    const sessions = await prisma.session.findMany({
+      orderBy: { date: "desc" },
+      include: {
+        entries: {
+          include: { player: true },
+          orderBy: { rowNumber: "asc" },
+        },
       },
-    },
-  })
-
-  return NextResponse.json(sessions)
+    })
+    return NextResponse.json(sessions)
+  } catch (err) {
+    console.error("GET /api/sessions error:", err)
+    return NextResponse.json({ error: "Gagal mengambil data" }, { status: 500 })
+  }
 }
 
 export async function POST(req: Request) {
@@ -46,26 +50,32 @@ export async function POST(req: Request) {
     )
   }
 
-  const gameSession = await prisma.session.create({
-    data: {
-      date: new Date(date),
-      notes: notes ?? null,
-      createdBy: session.user!.id!,
-      entries: {
-        create: entries.map((e: { playerId: number; rowNumber: number; pl: number }) => ({
-          playerId: e.playerId,
-          rowNumber: e.rowNumber,
-          pl: e.pl,
-        })),
+  let gameSession
+  try {
+    gameSession = await prisma.session.create({
+      data: {
+        date: new Date(date),
+        notes: notes ?? null,
+        createdBy: session.user!.id!,
+        entries: {
+          create: entries.map((e: { playerId: number; rowNumber: number; pl: number }) => ({
+            playerId: e.playerId,
+            rowNumber: e.rowNumber,
+            pl: e.pl,
+          })),
+        },
       },
-    },
-    include: {
-      entries: {
-        include: { player: true },
-        orderBy: { rowNumber: "asc" },
+      include: {
+        entries: {
+          include: { player: true },
+          orderBy: { rowNumber: "asc" },
+        },
       },
-    },
-  })
+    })
+  } catch (err) {
+    console.error("POST /api/sessions error:", err)
+    return NextResponse.json({ error: "Gagal menyimpan session ke database" }, { status: 500 })
+  }
 
   return NextResponse.json(gameSession, { status: 201 })
 }
