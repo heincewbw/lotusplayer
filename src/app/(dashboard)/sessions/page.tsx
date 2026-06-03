@@ -30,7 +30,8 @@ export default function SessionsPage() {
   useEffect(() => {
     fetch("/api/sessions")
       .then((r) => r.json())
-      .then((data) => { setSessions(data); setLoading(false) })
+      .then((data) => { setSessions(Array.isArray(data) ? data : []); setLoading(false) })
+      .catch(() => setLoading(false))
   }, [])
 
   const filteredSessions = sessions.filter((s) => {
