@@ -224,10 +224,10 @@ export default function NewSessionPage() {
           </div>
 
           {/* Column headers */}
-          <div className="grid grid-cols-[2rem_1fr] sm:grid-cols-[2rem_1fr_7rem] border-b border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700">
+          <div className="grid grid-cols-[2rem_1fr_7rem] border-b border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700">
             <div className="px-2 py-2 text-xs font-semibold text-gray-500 dark:text-slate-400 text-center border-r border-gray-200 dark:border-slate-600">#</div>
-            <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-slate-400 sm:border-r sm:border-gray-200 sm:dark:border-slate-600">Nama Player <span className="sm:hidden text-gray-400 dark:text-slate-500 font-normal">/ Nilai</span></div>
-            <div className="hidden sm:block px-2 py-2 text-xs font-semibold text-gray-500 dark:text-slate-400 text-right">Profit / Loss</div>
+            <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-slate-400 border-r border-gray-200 dark:border-slate-600">Nama Player</div>
+            <div className="px-2 py-2 text-xs font-semibold text-gray-500 dark:text-slate-400 text-right">P/L</div>
           </div>
 
           {/* Data rows */}
@@ -235,50 +235,44 @@ export default function NewSessionPage() {
             const pl = getPL(row)
             const used = usedPlayerIds(i)
             return (
-              <div key={i} className="border-b border-gray-100 dark:border-slate-700 last:border-0">
-                {/* Mobile: 2-line layout. Desktop: single row 3-column */}
-                <div className="grid grid-cols-[2rem_1fr] sm:grid-cols-[2rem_1fr_7rem]">
-                  {/* # column — spans 2 rows on mobile */}
-                  <div className="text-xs text-gray-400 dark:text-slate-500 text-center border-r border-gray-100 dark:border-slate-700 flex items-center justify-center row-span-2 sm:row-span-1 min-h-[40px]">
-                    {i + 1}
-                  </div>
-                  {/* Player picker */}
-                  <div className="border-b border-gray-100 dark:border-slate-700 sm:border-b-0 sm:border-r sm:border-gray-100 sm:dark:border-slate-700 overflow-visible">
-                    <PlayerPicker
-                      value={row.playerId}
-                      onChange={(id) => updateRow(i, "playerId", id)}
-                      players={players}
-                      usedIds={used}
-                    />
-                  </div>
-                  {/* P/L input — on mobile: full width second line; on desktop: 3rd column */}
-                  <div className="flex items-stretch col-start-2 sm:col-start-auto min-h-[36px]">
-                    <button
-                      type="button"
-                      onPointerDown={(e) => { e.preventDefault(); toggleSign(i) }}
-                      className={`flex-shrink-0 w-10 text-xs font-bold border-r border-gray-100 dark:border-slate-700 select-none active:opacity-75 ${
-                        row.pl.startsWith("-")
-                          ? "text-white bg-red-500 dark:bg-red-600"
-                          : "text-gray-400 dark:text-slate-500 bg-white dark:bg-slate-800"
-                      }`}
-                    >
-                      (-)
-                    </button>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={row.pl.startsWith("-") ? row.pl.slice(1) : row.pl}
-                      onChange={(e) => {
-                        const digits = e.target.value.replace(/[^0-9]/g, "")
-                        const isNeg = row.pl.startsWith("-")
-                        updateRow(i, "pl", isNeg ? (digits ? "-" + digits : "-") : digits)
-                      }}
-                      className={`flex-1 min-w-0 px-2 text-sm text-right bg-white dark:bg-slate-800 focus:outline-none focus:bg-gray-50 dark:focus:bg-slate-700 font-medium ${
-                        pl === null ? "text-gray-900 dark:text-slate-100" : pl > 0 ? "text-green-600 dark:text-green-400" : pl < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-slate-500"
-                      }`}
-                      placeholder="0"
-                    />
-                  </div>
+              <div key={i} className="grid grid-cols-[2rem_1fr_7rem] border-b border-gray-100 dark:border-slate-700 last:border-0 min-h-[40px]">
+                <div className="text-xs text-gray-400 dark:text-slate-500 text-center border-r border-gray-100 dark:border-slate-700 flex items-center justify-center">
+                  {i + 1}
+                </div>
+                <div className="border-r border-gray-100 dark:border-slate-700 overflow-visible">
+                  <PlayerPicker
+                    value={row.playerId}
+                    onChange={(id) => updateRow(i, "playerId", id)}
+                    players={players}
+                    usedIds={used}
+                  />
+                </div>
+                <div className="flex items-stretch">
+                  <button
+                    type="button"
+                    onPointerDown={(e) => { e.preventDefault(); toggleSign(i) }}
+                    className={`flex-shrink-0 w-9 text-xs font-bold border-r border-gray-100 dark:border-slate-700 select-none active:opacity-75 ${
+                      row.pl.startsWith("-")
+                        ? "text-white bg-red-500 dark:bg-red-600"
+                        : "text-gray-400 dark:text-slate-500 bg-white dark:bg-slate-800"
+                    }`}
+                  >
+                    (-)
+                  </button>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={row.pl.startsWith("-") ? row.pl.slice(1) : row.pl}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/[^0-9]/g, "")
+                      const isNeg = row.pl.startsWith("-")
+                      updateRow(i, "pl", isNeg ? (digits ? "-" + digits : "-") : digits)
+                    }}
+                    className={`flex-1 min-w-0 px-1 text-sm text-right bg-white dark:bg-slate-800 focus:outline-none focus:bg-gray-50 dark:focus:bg-slate-700 font-medium ${
+                      pl === null ? "text-gray-900 dark:text-slate-100" : pl > 0 ? "text-green-600 dark:text-green-400" : pl < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-slate-500"
+                    }`}
+                    placeholder="0"
+                  />
                 </div>
               </div>
             )
