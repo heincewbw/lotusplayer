@@ -202,7 +202,6 @@ export default function NewSessionPage() {
 
   return (
     <div className="pb-24 sm:pb-0">
-      <h1 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-4">Session Baru</h1>
 
       <form id="new-session-form" onSubmit={handleSubmit}>
         {/* Session table */}
@@ -224,7 +223,7 @@ export default function NewSessionPage() {
           </div>
 
           {/* Column headers */}
-          <div className="grid grid-cols-[2rem_1fr_7rem] border-b border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700">
+          <div className="grid grid-cols-[2rem_minmax(0,1fr)_7rem] border-b border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700">
             <div className="px-2 py-2 text-xs font-semibold text-gray-500 dark:text-slate-400 text-center border-r border-gray-200 dark:border-slate-600">#</div>
             <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-slate-400 border-r border-gray-200 dark:border-slate-600">Nama Player</div>
             <div className="px-2 py-2 text-xs font-semibold text-gray-500 dark:text-slate-400 text-right">P/L</div>
@@ -235,7 +234,7 @@ export default function NewSessionPage() {
             const pl = getPL(row)
             const used = usedPlayerIds(i)
             return (
-              <div key={i} className="grid grid-cols-[2rem_1fr_7rem] border-b border-gray-100 dark:border-slate-700 last:border-0 min-h-[40px]">
+              <div key={i} className="grid grid-cols-[2rem_minmax(0,1fr)_7rem] border-b border-gray-100 dark:border-slate-700 last:border-0 min-h-[40px]">
                 <div className="text-xs text-gray-400 dark:text-slate-500 text-center border-r border-gray-100 dark:border-slate-700 flex items-center justify-center">
                   {i + 1}
                 </div>
