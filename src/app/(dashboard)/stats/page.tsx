@@ -25,7 +25,11 @@ type PlayerTotal = {
 
 type TrendRow = Record<string, string | number>
 
-const COLORS = ["#22c55e", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"]
+const COLORS = [
+  "#22c55e", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899",
+  "#06b6d4", "#f97316", "#84cc16", "#e879f9", "#14b8a6", "#fb7185",
+  "#a78bfa", "#fbbf24", "#34d399",
+]
 
 export default function StatsPage() {
   const [playerTotals, setPlayerTotals] = useState<PlayerTotal[]>([])
@@ -33,6 +37,7 @@ export default function StatsPage() {
   const [loading, setLoading] = useState(true)
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
+  const [selectedPlayers, setSelectedPlayers] = useState<Set<string>>(new Set())
   const { theme } = useTheme()
   const isDark = theme === "dark"
 
@@ -47,6 +52,13 @@ export default function StatsPage() {
       .then((data) => {
         setPlayerTotals(data.playerTotals)
         setTrend(data.trend)
+        // Default: top 2 players by profit
+        const top2: string[] = (data.playerTotals as PlayerTotal[])
+          .slice()
+          .sort((a, b) => b.total - a.total)
+          .slice(0, 2)
+          .map((p) => p.name)
+        setSelectedPlayers(new Set(top2))
         setLoading(false)
       })
   }, [startDate, endDate])
@@ -190,7 +202,66 @@ export default function StatsPage() {
       {/* Line chart - trend per session */}
       {trend.length > 1 && (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-4">
-          <h2 className="font-semibold text-gray-800 dark:text-slate-200 text-sm mb-4">Tren P/L per Session</h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+            <h2 className="font-semibold text-gray-800 dark:text-slate-200 text-sm">Tren P/L per Session</h2>
+            <div className="flex gap-2 text-xs">
+              <button
+                onClick={() => setSelectedPlayers(new Set(playerNames))}
+                className="text-green-600 dark:text-green-400 hover:underline"
+              >
+                Pilih Semua
+              </button>
+              <span className="text-gray-400 dark:text-slate-600">|</span>
+              <button
+                onClick={() => setSelectedPlayers(new Set())}
+                className="text-gray-500 dark:text-slate-400 hover:underline"
+              >
+                Hapus Semua
+              </button>
+            </div>
+          </div>
+
+          {/* Player checkboxes */}
+          <div className="flex flex-wrap gap-x-3 gap-y-1.5 mb-4 pb-3 border-b border-gray-100 dark:border-slate-700">
+            {playerNames.map((name, i) => {
+              const color = COLORS[i % COLORS.length]
+              const checked = selectedPlayers.has(name)
+              return (
+                <label
+                  key={name}
+                  className="flex items-center gap-1.5 cursor-pointer select-none group"
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => {
+                      setSelectedPlayers((prev) => {
+                        const next = new Set(prev)
+                        if (next.has(name)) next.delete(name)
+                        else next.add(name)
+                        return next
+                      })
+                    }}
+                    className="sr-only"
+                  />
+                  <span
+                    className="w-3 h-3 rounded-sm flex-shrink-0 border-2 transition-colors"
+                    style={{
+                      backgroundColor: checked ? color : "transparent",
+                      borderColor: color,
+                    }}
+                  />
+                  <span
+                    className="text-xs transition-colors"
+                    style={{ color: checked ? color : isDark ? "#64748b" : "#9ca3af" }}
+                  >
+                    {name}
+                  </span>
+                </label>
+              )
+            })}
+          </div>
+
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={trend} margin={{ top: 4, right: 8, left: 0, bottom: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#334155" : "#e5e7eb"} />
@@ -201,18 +272,19 @@ export default function StatsPage() {
                 labelStyle={{ color: isDark ? "#e2e8f0" : "#111827" }}
                 itemStyle={{ color: isDark ? "#94a3b8" : "#6b7280" }}
               />
-              <Legend wrapperStyle={{ color: isDark ? "#94a3b8" : "#6b7280" }} />
-              {playerNames.map((name, i) => (
-                <Line
-                  key={name}
-                  type="monotone"
-                  dataKey={name}
-                  stroke={COLORS[i % COLORS.length]}
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  connectNulls
-                />
-              ))}
+              {playerNames.map((name, i) =>
+                selectedPlayers.has(name) ? (
+                  <Line
+                    key={name}
+                    type="monotone"
+                    dataKey={name}
+                    stroke={COLORS[i % COLORS.length]}
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                    connectNulls
+                  />
+                ) : null
+              )}
             </LineChart>
           </ResponsiveContainer>
         </div>

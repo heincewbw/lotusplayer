@@ -6,7 +6,7 @@ type Player = { id: number; name: string }
 type RowData = { playerId: string; pl: string }
 
 const MAX_ROWS = 9
-const INIT_ROWS = 4
+const INIT_ROWS = 6
 
 const emptyRow = (): RowData => ({ playerId: "", pl: "" })
 
@@ -69,7 +69,7 @@ function PlayerPicker({
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
-      <div className="flex items-center h-full min-h-[48px]">
+      <div className="flex items-center h-full min-h-[40px]">
         <input
           type="text"
           value={displayValue}
@@ -77,7 +77,7 @@ function PlayerPicker({
           onChange={(e) => { setQuery(e.target.value); setOpen(true) }}
           placeholder="Cari player..."
           autoComplete="off"
-          className="flex-1 min-w-0 min-h-[48px] px-2 text-base bg-transparent text-gray-900 dark:text-slate-100 focus:outline-none placeholder-gray-300 dark:placeholder-slate-600"
+          className="flex-1 min-w-0 min-h-[40px] px-2 text-sm bg-transparent text-gray-900 dark:text-slate-100 focus:outline-none placeholder-gray-300 dark:placeholder-slate-600"
         />
         {value ? (
           <button
@@ -100,7 +100,7 @@ function PlayerPicker({
                 key={p.id}
                 type="button"
                 onPointerDown={(e) => { e.preventDefault(); select(p) }}
-                className="w-full text-left px-3 py-3 text-base text-gray-900 dark:text-slate-100 hover:bg-green-50 dark:hover:bg-slate-700 active:bg-green-100 border-b border-gray-100 dark:border-slate-700 last:border-0"
+                className="w-full text-left px-3 py-2 text-sm text-gray-900 dark:text-slate-100 hover:bg-green-50 dark:hover:bg-slate-700 active:bg-green-100 border-b border-gray-100 dark:border-slate-700 last:border-0"
               >
                 {p.name}
               </button>
@@ -235,7 +235,7 @@ export default function NewSessionPage() {
             const pl = getPL(row)
             const used = usedPlayerIds(i)
             return (
-              <div key={i} className="grid grid-cols-[2.5rem_1fr_7rem] border-b border-gray-100 dark:border-slate-700 last:border-0 min-h-[48px]">
+              <div key={i} className="grid grid-cols-[2.5rem_1fr_7rem] border-b border-gray-100 dark:border-slate-700 last:border-0 min-h-[40px]">
                 <div className="text-xs text-gray-400 dark:text-slate-500 text-center border-r border-gray-100 dark:border-slate-700 flex items-center justify-center">
                   {i + 1}
                 </div>
@@ -268,7 +268,7 @@ export default function NewSessionPage() {
                       const isNeg = row.pl.startsWith("-")
                       updateRow(i, "pl", isNeg ? (digits ? "-" + digits : "-") : digits)
                     }}
-                    className={`flex-1 min-w-0 px-2 text-base text-right bg-white dark:bg-slate-800 focus:outline-none focus:bg-gray-50 dark:focus:bg-slate-700 font-medium ${
+                    className={`flex-1 min-w-0 px-2 text-sm text-right bg-white dark:bg-slate-800 focus:outline-none focus:bg-gray-50 dark:focus:bg-slate-700 font-medium ${
                       pl === null ? "text-gray-900 dark:text-slate-100" : pl > 0 ? "text-green-600 dark:text-green-400" : pl < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-slate-500"
                     }`}
                     placeholder="0"
