@@ -51,12 +51,19 @@ export async function GET(req: Request) {
 
   const playerTotals = Array.from(totalsMap.values()).sort((a, b) => b.total - a.total)
 
+  // Build cumulative P/L trend
+  const cumulativeMap = new Map<string, number>()
   const trend = sessions.map((s) => {
+    // Update running totals for players in this session
+    for (const e of s.entries) {
+      cumulativeMap.set(e.player.name, (cumulativeMap.get(e.player.name) ?? 0) + e.pl)
+    }
     const row: Record<string, string | number> = {
       date: s.date.toISOString().split("T")[0],
     }
-    for (const e of s.entries) {
-      row[e.player.name] = e.pl
+    // Only include players who have played at least once so far
+    for (const [name, total] of cumulativeMap.entries()) {
+      row[name] = total
     }
     return row
   })
