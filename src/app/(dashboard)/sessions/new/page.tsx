@@ -116,6 +116,22 @@ function PlayerPicker({
   )
 }
 
+type ParsedEntry = { rawName: string; pl: number }
+type MappingEntry = { rawName: string; pl: number; selectedPlayerId: string }
+
+function parseTextInput(text: string): ParsedEntry[] {
+  const entries: ParsedEntry[] = []
+  const regex = /([a-zA-Z][a-zA-Z0-9]*)\s*([+-]\s*[0-9]+|[0-9]+)/g
+  let match
+  while ((match = regex.exec(text)) !== null) {
+    const rawName = match[1]
+    const plStr = match[2].replace(/\s/g, "")
+    const pl = parseInt(plStr, 10)
+    if (!isNaN(pl)) entries.push({ rawName, pl })
+  }
+  return entries
+}
+
 export default function NewSessionPage() {
   const router = useRouter()
   const [players, setPlayers] = useState<Player[]>([])
@@ -125,6 +141,13 @@ export default function NewSessionPage() {
   const [notes, setNotes] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState("")
+
+  // Text input states
+  const [textModalOpen, setTextModalOpen] = useState(false)
+  const [rawText, setRawText] = useState("")
+  const [autoEntries, setAutoEntries] = useState<{ playerId: number; pl: number }[]>([])
+  const [mappingEntries, setMappingEntries] = useState<MappingEntry[]>([])
+  const [mappingModalOpen, setMappingModalOpen] = useState(false)
 
   useEffect(() => {
     fetch("/api/players").then((r) => r.json()).then(setPlayers)
@@ -146,6 +169,57 @@ export default function NewSessionPage() {
   function addRow() {
     if (rows.length >= MAX_ROWS) return
     setRows((prev) => [...prev, emptyRow()])
+  }
+
+  function applyEntries(entries: { playerId: number; pl: number }[]) {
+    const newRows: RowData[] = entries.slice(0, MAX_ROWS).map((e) => ({
+      playerId: String(e.playerId),
+      pl: String(e.pl),
+    }))
+    while (newRows.length < INIT_ROWS) newRows.push(emptyRow())
+    setRows(newRows)
+  }
+
+  function processTextInput() {
+    const parsed = parseTextInput(rawText)
+    if (parsed.length === 0) return
+
+    const auto: { playerId: number; pl: number }[] = []
+    const unmatched: MappingEntry[] = []
+
+    for (const entry of parsed) {
+      const found = players.find((p) => p.name.toLowerCase() === entry.rawName.toLowerCase())
+      if (found) {
+        auto.push({ playerId: found.id, pl: entry.pl })
+      } else {
+        unmatched.push({ rawName: entry.rawName, pl: entry.pl, selectedPlayerId: "" })
+      }
+    }
+
+    setAutoEntries(auto)
+    setTextModalOpen(false)
+
+    if (unmatched.length > 0) {
+      setMappingEntries(unmatched)
+      setMappingModalOpen(true)
+    } else {
+      applyEntries(auto)
+      setRawText("")
+    }
+  }
+
+  function applyMappings() {
+    const allEntries = [
+      ...autoEntries,
+      ...mappingEntries
+        .filter((e) => e.selectedPlayerId)
+        .map((e) => ({ playerId: parseInt(e.selectedPlayerId), pl: e.pl })),
+    ]
+    applyEntries(allEntries)
+    setMappingModalOpen(false)
+    setMappingEntries([])
+    setAutoEntries([])
+    setRawText("")
   }
 
   const filledRows = rows.filter((r) => r.playerId && getPL(r) !== null)
@@ -202,6 +276,17 @@ export default function NewSessionPage() {
 
   return (
     <div className="pb-24 sm:pb-0">
+
+      {/* Text input button */}
+      <div className="mb-3 flex justify-end">
+        <button
+          type="button"
+          onClick={() => setTextModalOpen(true)}
+          className="flex items-center gap-1.5 text-sm font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 px-3 py-2 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors active:opacity-75"
+        >
+          <span className="text-base leading-none">⌨</span> Input Teks
+        </button>
+      </div>
 
       <form id="new-session-form" onSubmit={handleSubmit}>
         {/* Session table */}
@@ -386,6 +471,98 @@ export default function NewSessionPage() {
           {submitting ? "..." : "Submit"}
         </button>
       </div>
+
+      {/* Text Input Modal */}
+      {textModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50">
+          <div className="w-full sm:max-w-lg bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-2xl shadow-xl p-4 sm:p-6">
+            <h2 className="text-base font-semibold text-gray-800 dark:text-slate-100 mb-1">Input Teks</h2>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mb-3">
+              Tempel teks hasil sesi. Contoh: <code className="bg-gray-100 dark:bg-slate-700 px-1 rounded">philip -6000</code> atau <code className="bg-gray-100 dark:bg-slate-700 px-1 rounded">john -700  hk-5300</code>
+            </p>
+            <textarea
+              value={rawText}
+              onChange={(e) => setRawText(e.target.value)}
+              rows={6}
+              placeholder={"philip -6000\njohn -700  hk-5300\nedy +4000\nwilly +6000"}
+              className="w-full bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm font-mono text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+              autoFocus
+            />
+            <div className="mt-3 flex gap-2 justify-end">
+              <button
+                type="button"
+                onClick={() => { setTextModalOpen(false); setRawText("") }}
+                className="text-sm text-gray-500 dark:text-slate-400 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={processTextInput}
+                disabled={!rawText.trim()}
+                className="text-sm font-semibold bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 disabled:opacity-40 transition-colors"
+              >
+                Proses
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Name Mapping Modal */}
+      {mappingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50">
+          <div className="w-full sm:max-w-lg bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-2xl shadow-xl p-4 sm:p-6 max-h-[90dvh] overflow-y-auto">
+            <h2 className="text-base font-semibold text-gray-800 dark:text-slate-100 mb-1">Cocokkan Nama Player</h2>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">
+              Nama berikut tidak ditemukan di database. Pilih player yang sesuai atau biarkan kosong untuk melewati.
+            </p>
+            <div className="space-y-3">
+              {mappingEntries.map((entry, i) => (
+                <div key={i} className="bg-gray-50 dark:bg-slate-700 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-gray-800 dark:text-slate-100">
+                      &quot;{entry.rawName}&quot;
+                    </span>
+                    <span className={`text-sm font-bold ${entry.pl > 0 ? "text-green-600 dark:text-green-400" : entry.pl < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400"}`}>
+                      {entry.pl > 0 ? `+${entry.pl.toLocaleString()}` : entry.pl.toLocaleString()}
+                    </span>
+                  </div>
+                  <select
+                    value={entry.selectedPlayerId}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setMappingEntries((prev) => prev.map((m, idx) => idx === i ? { ...m, selectedPlayerId: val } : m))
+                    }}
+                    className="w-full text-sm bg-white dark:bg-slate-600 border border-gray-200 dark:border-slate-500 rounded-lg px-3 py-2 text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">— Lewati —</option>
+                    {players.map((p) => (
+                      <option key={p.id} value={String(p.id)}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 flex gap-2 justify-end">
+              <button
+                type="button"
+                onClick={() => { setMappingModalOpen(false); setMappingEntries([]); setAutoEntries([]); setTextModalOpen(true) }}
+                className="text-sm text-gray-500 dark:text-slate-400 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
+              >
+                Kembali
+              </button>
+              <button
+                type="button"
+                onClick={applyMappings}
+                className="text-sm font-semibold bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Terapkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
