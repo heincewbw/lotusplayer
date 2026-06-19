@@ -1,6 +1,7 @@
 /**
  * Pre-flight DB migration script.
- * Runs `prisma db push` before `next start` to keep the schema in sync.
+ * Runs `prisma migrate deploy` before `next start` to apply pending migrations.
+ * Safe for production — never drops data.
  * Non-fatal — logs errors but never prevents the app from starting.
  */
 import { execSync } from "child_process"
@@ -12,12 +13,12 @@ setTimeout(() => {
 }, 60_000).unref()
 
 try {
-  console.log("⚙  Syncing Prisma schema ...")
-  execSync("node_modules/.bin/prisma db push --accept-data-loss --skip-generate", {
+  console.log("⚙  Applying pending migrations ...")
+  execSync("node_modules/.bin/prisma migrate deploy", {
     stdio: ["ignore", "inherit", "inherit"],
     timeout: 50_000,
   })
-  console.log("✓  Schema sync complete")
+  console.log("✓  Migrations applied")
 } catch (err) {
   console.error("⚠  db-migrate error (app will still start):", err.message)
 }
