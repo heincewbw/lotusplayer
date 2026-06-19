@@ -277,17 +277,6 @@ export default function NewSessionPage() {
   return (
     <div className="pb-24 sm:pb-0">
 
-      {/* Text input button */}
-      <div className="mb-3 flex justify-end">
-        <button
-          type="button"
-          onClick={() => setTextModalOpen(true)}
-          className="flex items-center gap-1.5 text-sm font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 px-3 py-2 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors active:opacity-75"
-        >
-          <span className="text-base leading-none">⌨</span> Input Teks
-        </button>
-      </div>
-
       <form id="new-session-form" onSubmit={handleSubmit}>
         {/* Session table */}
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
@@ -426,7 +415,7 @@ export default function NewSessionPage() {
         )}
 
         {/* Desktop submit buttons */}
-        <div className="mt-4 hidden sm:flex gap-3">
+        <div className="mt-4 hidden sm:flex gap-3 items-center">
           <button
             type="submit"
             disabled={!canSubmit || submitting}
@@ -440,6 +429,13 @@ export default function NewSessionPage() {
             className="text-sm text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-200 px-4 py-2.5"
           >
             Batal
+          </button>
+          <button
+            type="button"
+            onClick={() => setTextModalOpen(true)}
+            className="ml-auto flex items-center gap-1.5 text-sm font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 px-3 py-2 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors active:opacity-75"
+          >
+            <span className="text-base leading-none">⌨</span> Input Teks
           </button>
         </div>
       </form>
@@ -461,6 +457,13 @@ export default function NewSessionPage() {
           className="text-sm text-gray-500 dark:text-slate-400 px-3 py-2.5"
         >
           Batal
+        </button>
+        <button
+          type="button"
+          onClick={() => setTextModalOpen(true)}
+          className="flex items-center gap-1 text-sm font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 px-3 py-2 rounded-lg active:opacity-75"
+        >
+          <span className="leading-none">⌨</span>
         </button>
         <button
           type="submit"
