@@ -54,12 +54,12 @@ export default function PlayerDetailPage() {
   const played = sessions.length
   const winRate = played > 0 ? Math.round((wins / played) * 100) : 0
 
-  // Build trend data for chart
-  const trendData = sessions.map((s, i) => ({
-    session: i + 1,
-    date: s.date,
-    pl: s.pl,
-  }))
+  // Build cumulative P/L data for chart
+  let running = 0
+  const trendData = sessions.map((s) => {
+    running += s.pl
+    return { date: s.date, cumulative: running }
+  })
 
   return (
     <div className="space-y-6">
@@ -106,7 +106,7 @@ export default function PlayerDetailPage() {
       {/* P/L trend chart */}
       {trendData.length > 1 && (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-4">
-          <h2 className="font-semibold text-gray-800 dark:text-slate-200 text-sm mb-4">Tren P/L per Session</h2>
+          <h2 className="font-semibold text-gray-800 dark:text-slate-200 text-sm mb-4">Akumulasi P/L</h2>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={trendData} margin={{ top: 4, right: 8, left: 0, bottom: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#334155" : "#e5e7eb"} />
@@ -122,13 +122,13 @@ export default function PlayerDetailPage() {
                 labelFormatter={(v) => formatDate(String(v))}
                 formatter={(value) =>
                   typeof value === "number"
-                    ? [value > 0 ? `+${value.toLocaleString()}` : value.toLocaleString(), "P/L"]
-                    : [value, "P/L"]
+                    ? [value > 0 ? `+${value.toLocaleString()}` : value.toLocaleString(), "Akumulasi"]
+                    : [value, "Akumulasi"]
                 }
               />
               <Line
                 type="monotone"
-                dataKey="pl"
+                dataKey="cumulative"
                 stroke="#22c55e"
                 strokeWidth={2}
                 dot={{ r: 4 }}
