@@ -13,12 +13,12 @@ setTimeout(() => {
 }, 60_000).unref()
 
 try {
-  console.log("⚙  Applying pending migrations ...")
-  execSync("node_modules/.bin/prisma migrate deploy", {
+  console.log("⚙  Syncing Prisma schema (safe, no data loss) ...")
+  execSync("node_modules/.bin/prisma db push --skip-generate", {
     stdio: ["ignore", "inherit", "inherit"],
     timeout: 50_000,
   })
-  console.log("✓  Migrations applied")
+  console.log("✓  Schema sync complete")
 } catch (err) {
   console.error("⚠  db-migrate error (app will still start):", err.message)
 }
